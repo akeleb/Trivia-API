@@ -198,22 +198,22 @@ def create_app(test_config=None):
     def get_category_questions(category_id):
         
         # get the category by id
-        category = Category.query.filter_by(id=category_id).one_or_none()
+        category = Category.query.filter_by(id = str(category_id)).one_or_none()
         # abort bad request(400) if the category is not found
-        if category is None:
-            abort(400)
+        # if category is None:
+        #     abort(400)
          # get the matching questions for the specfifed category.id
-        selection = Question.query.filter_by(category=category.id).all()
+        selection = Question.query.filter_by(category = str(category.id)).all()
         # paginate the results
         current_questions = paginate_questions(request, selection)
 
-        if len( current_questions) == 0:
-            abort(404)
+        # if len( current_questions) == 0:
+        #     abort(404)
 
         return jsonify({
             'success': True,
-            'questions': [question.format() for question in  current_questions],
-            'total_questions': len( current_questions),
+            'questions':current_questions,
+            'total_questions': len(current_questions),
             'current_category': category_id
         })
     
@@ -229,6 +229,7 @@ def create_app(test_config=None):
             quiz_Category= body.get('quiz_category')
             previous_questions = body.get('previous_questions')
             category_id = quiz_Category['id']
+            
             if (quiz_Category is None) or (previous_questions is None):
                 abort(422) 
 

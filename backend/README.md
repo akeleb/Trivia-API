@@ -69,36 +69,261 @@ One note before you delve into your tasks: for each endpoint, you are expected t
 
 ## Documenting your Endpoints
 
-You will need to provide detailed documentation of your API endpoints including the URL, request parameters, and the response body. Use the example below as a reference.
 
-### Documentation Example
+* Base URL: Currently this application is only hosted locally. The backend is hosted at `http://127.0.0.1:5000/`
+* Authentication: This version does not require authentication or API keys.
 
-`GET '/api/v1.0/categories'`
+### Error Handling
 
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, `categories`, that contains an object of `id: category_string` key: value pairs.
+Errors are returned as JSON in the following format:<br>
 
-```json
-{
-  "1": "Science",
-  "2": "Art",
-  "3": "Geography",
-  "4": "History",
-  "5": "Entertainment",
-  "6": "Sports"
+    {
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }
+
+The API will return three types of errors:
+
+* 400 – bad request
+* 404 – resource not found
+* 422 – unprocessable
+
+### Endpoints
+
+#### GET /categories
+
+* General: Returns a list categories.
+* Sample: `curl http://127.0.0.1:5000/categories`<br>
+
+        {
+            "categories": {
+                "1": "Science", 
+                "2": "Art", 
+                "3": "Geography", 
+                "4": "History", 
+                "5": "Entertainment", 
+                "6": "Sports"
+            }, 
+            "success": true
+        }
+
+
+#### GET /questions
+
+* General:
+  * Returns a list questions.
+  * Results are paginated in groups of 10.
+  * Also returns list of categories and total number of questions.
+* Sample: `curl http://127.0.0.1:5000/questions`<br>
+
+        {
+            "categories": {
+                "1": "Science", 
+                "2": "Art", 
+                "3": "Geography", 
+                "4": "History", 
+                "5": "Entertainment", 
+                "6": "Sports"
+            }, 
+            "questions": [
+                {
+                    "answer": "Colorado, New Mexico, Arizona, Utah", 
+                    "category": 3, 
+                    "difficulty": 3, 
+                    "id": 164, 
+                    "question": "Which four states make up the 4 Corners region of the US?"
+                }, 
+                {
+                    "answer": "Addis Ababa", 
+                    "category": 4, 
+                    "difficulty": 1, 
+                    "id": 9, 
+                    "question": "What is the capital city of EThiopia?"
+                }, 
+                {
+                    "answer": "Joe Biden", 
+                    "category": 5, 
+                    "difficulty": 4, 
+                    "id": 2, 
+                    "question": "who is the current USA president?"
+                }, 
+                {
+                    "answer": "Tom Cruise", 
+                    "category": 5, 
+                    "difficulty": 4, 
+                    "id": 4, 
+                    "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+                }, 
+                {
+                    "answer": "Russia", 
+                    "category": 4, 
+                    "difficulty": 2, 
+                    "id": 6, 
+                    "question": "wgich country is the largest in the worled by area?"
+                }
+            ], 
+            "success": true, 
+            "total_questions": 5
+        }
+
+#### DELETE /questions/<int:question_id>
+
+* General:
+  * Deletes a question by id using url parameters.
+  * Returns id of deleted question upon success.
+* Sample: `curl http://127.0.0.1:5000/questions/6 -X DELETE`<br>
+
+        {
+            "deleted": 6, 
+            "success": true
+        }
+
+#### POST /questions
+
+This endpoint either creates a new question or returns search results.
+
+1. If <strong>no</strong> search term is included in request:
+
+* General:
+  * Creates a new question.
+  * Returns JSON object with newly created question, as well as paginated questions.
+* Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{
+            "question": "Which is the only african country never colonized?",
+            "answer": "Ethiopia",
+            "difficulty": 3,
+            "category": "6"
+        }'`<br>
+
+        {
+            "created": 16, 
+            "question_created": "Which is the only team to play in every soccer World Cup tournament?", 
+            "questions": [
+                {
+                    "answer": "Colorado, New Mexico, Arizona, Utah", 
+                    "category": 3, 
+                    "difficulty": 3, 
+                    "id": 164, 
+                    "question": "Which four states make up the 4 Corners region of the US?"
+                }, 
+                {
+                    "answer": "Addis Ababa", 
+                    "category": 4, 
+                    "difficulty": 1, 
+                    "id": 9, 
+                    "question": "What is the capital city of EThiopia?"
+                }, 
+                {
+                    "answer": "Joe Biden", 
+                    "category": 5, 
+                    "difficulty": 4, 
+                    "id": 2, 
+                    "question": "who is the current USA president?"
+                }, 
+                {
+                    "answer": "Tom Cruise", 
+                    "category": 5, 
+                    "difficulty": 4, 
+                    "id": 4, 
+                    "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+                }, 
+                {
+                    "answer": "Russia", 
+                    "category": 4, 
+                    "difficulty": 2, 
+                    "id": 6, 
+                    "question": "wgich country is the largest in the worled by area?"
+                }
+
+            ], 
+            "success": true, 
+            "total_questions": 5
+        }
+curl -X POST -H "Content-Type: application/json" -d '{"searchTerm":"egyptian"}' http://127.0.0.1:5000/questions
+
+2. If search term <strong>is</strong> included in request:
+
+* General:
+  * Searches for questions using search term in the request.
+  * Returns JSON object with paginated matching questions.
+* Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"searchTerm": "egyptian"}'`<br>
+
+        "questions": [
+    {
+      "answer": "Axume",
+      "category": 4,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which city is the oldest in Ethiopia?"
+    }
+  ],
+  "success": true,
+  "total_questions": 22
 }
-```
 
-## Testing
 
-Write at least one test for the success and at least one error behavior of each endpoint using the unittest library.
+#### GET /categories/<int:category_id>/questions
 
-To deploy the tests, run
+* General:
+  * Gets questions by category id using url parameters.
+  * Returns JSON object with paginated matching questions.
+* Sample: `curl http://127.0.0.1:5000/categories/1/questions`<br>
 
-```bash
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
-```
+        "current_category": "Science",
+        "questions": [
+            {
+            "answer": "The Liver",
+            "category": 1,
+            "difficulty": 4,
+            "id": 20,
+            "question": "What is the heaviest organ in the human body?"
+            },
+            {
+            "answer": "Alexander Fleming",
+            "category": 1,
+            "difficulty": 3,
+            "id": 21,
+            "question": "Who discovered penicillin?"
+            },
+            {
+            "answer": "Blood",
+            "category": 1,
+            "difficulty": 4,
+            "id": 22,
+            "question": "Hematology is a branch of medicine involving the study of what?"
+            },
+            {
+            "answer": "hey abood",
+            "category": 1,
+            "difficulty": 1,
+            "id": 59,
+            "question": "hello wolrld"
+            }
+        ],
+        "success": true,
+        "total_questions": 22
+        }
+
+
+#### POST /quizzes
+
+* General:
+  * Allows users to play the quiz game.
+  * Uses JSON request parameters of the category and the previous questions.
+  * Returns JSON object with random question not among previous questions.
+* Sample: `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions": [10],"quiz_category": {"type": "Science", "id": "1"}}'`<br>
+
+        {
+        "question": {
+            "answer": "The Liver",
+            "category": 1,
+            "difficulty": 4,
+            "id": 20,
+            "question": "What is the heaviest organ in the human body?"
+        },
+        "success": true
+        }
+## Authors
+
+Akele Belay authored the API (`__init__.py`), test suite (`test_flaskr.py`), and this README.<br>
+All other project files, including the models and frontend, were created by [Udacity](https://www.udacity.com/).
