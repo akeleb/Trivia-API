@@ -1,10 +1,11 @@
 import os
+from tkinter import Text
 from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
 database_name = 'trivia'
-database_path = "postgresql+psycopg2://Akele:Aklexazsqldb14@pgforudacity.postgres.database.azure.com/trivia".format('localhost:5432', database_name)
+database_path = "postgresql+psycopg2://postgres:Aklexsqldb14@localhost:5432/udacityexc".format('localhost:5432', database_name)
 
 db = SQLAlchemy()
 
@@ -27,10 +28,10 @@ class Question(db.Model):
     __tablename__ = 'questions'
 
     id = Column(Integer, primary_key=True)
-    question = Column(String)
-    answer = Column(String)
-    category = Column(String)
-    difficulty = Column(Integer)
+    question = Column(String, nullable=False)
+    answer = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    difficulty = Column(Integer, nullable=False)
 
     def __init__(self, question, answer, category, difficulty):
         self.question = question
