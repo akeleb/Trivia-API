@@ -6,6 +6,24 @@ from flask_sqlalchemy import SQLAlchemy
 from flaskr import create_app
 from models import setup_db, Question, Category
 
+import sys
+import traceback
+
+try:
+    assert True
+    assert 7 == 7
+    assert 1 == 2
+    # many more statements like this
+except AssertionError:
+    _, _, tb = sys.exc_info()
+    traceback.print_tb(tb) # Fixed format
+    tb_info = traceback.extract_tb(tb)
+    filename, line, func, text = tb_info[-1]
+
+    print('An error occurred on line {} in statement {}'.format(line, text))
+    exit(1)
+    
+
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -90,7 +108,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
 
     def test_search_questions(self):
-        response = self.client().post('/questions',json={'searchTerm': 'Taj Mahal'})
+        response = self.client().post('/search',json={'searchTerm': 'Taj Mahal'})
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
@@ -98,7 +116,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']))
 
     def test_404_if_search_questions_fails(self):
-        response = self.client().post('/questions',json={'searchTerm': 'vlcmdssvdv'})
+        response = self.client().post('/search',json={'searchTerm': 'vlcmdssvdv'})
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 404)
@@ -115,7 +133,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['current_category'], 'Science')
 
     def test_400_if_questions_by_category_fails(self):
-        response = self.client().get('/categories/100/questions')
+        response = self.client().get('/categories/1/questions')
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 400)
