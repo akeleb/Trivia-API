@@ -4,11 +4,16 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
+<<<<<<< HEAD
 from models import setup_db, Question, Category
 
 import sys
 import traceback
     
+=======
+from models import setup_db, Question, Category 
+
+>>>>>>> a921d2121bb0f13d41815eceec96c0fa865977f2
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
