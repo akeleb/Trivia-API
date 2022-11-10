@@ -102,7 +102,7 @@ def create_app(test_config=None):
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page.
     """
-    @app.route('/questions/<question_id>', methods=['DELETE'])
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
         try:
             question = Question.query.get(question_id)
@@ -188,7 +188,7 @@ def create_app(test_config=None):
             })
         except Exception as err:
             print(err)
-            abort(422)
+            abort(404)
 
     """
     @TODO:
@@ -200,8 +200,8 @@ def create_app(test_config=None):
         # get the category by id
         category = Category.query.filter_by(id = str(category_id)).one_or_none()
         # abort bad request(400) if the category is not found
-        # if category is None:
-        #     abort(400)
+        if category is None:
+            abort(400)
          # get the matching questions for the specfifed category.id
         selection = Question.query.filter_by(category = str(category.id)).all()
         # paginate the results
@@ -246,7 +246,7 @@ def create_app(test_config=None):
             })
         except Exception as err:
             print(err)
-            abort(422)
+            abort(400)
 
     """
     @TODO:
